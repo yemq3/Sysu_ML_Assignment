@@ -85,7 +85,7 @@ def trainingDataSet():
         trainingMat[i,:] = img2vector('trainingDigits/%s' % fileNameStr)
     return hwLabels,trainingMat
 
-def createDataSet():
+def createDataSet(path):
     '''
     从trainingDigits文件夹下面读取所有数据文件，返回：
     trainingMat：所有训练数据，每一行代表一个数据文件中的内容
@@ -94,7 +94,7 @@ def createDataSet():
     hwLabels = []
 
     # 获取目录traningDigits内容(即数据集文件名)，并储存在一个list中
-    trainingFileList = listdir('trainingDigits')   
+    trainingFileList = listdir(path)   
     m = len(trainingFileList)   #当前目录文件数
 
     # 初始化m维向量的训练集，每个向量1024维
@@ -108,7 +108,7 @@ def createDataSet():
         hwLabels.append(classnumCut(fileNameStr))  
 
         # 将图片矩阵转换为向量并储存在新的矩阵中
-        trainingMat[i,:] = img2vector('trainingDigits/%s' % fileNameStr)
+        trainingMat[i,:] = img2vector(path + "/" + fileNameStr)
     return trainingMat,hwLabels
 
 # 测试函数
