@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from numpy import *
+import numpy as np
 import operator
 import time
 from os import listdir
@@ -17,7 +17,7 @@ def classify(inputPoint,dataSet,labels,k):
     dataSetSize = dataSet.shape[0]     
 
     # 先用tile函数将输入点拓展成与训练集相同维数的矩阵，再计算欧氏距离
-    diffMat = tile(inputPoint,(dataSetSize,1))-dataSet  
+    diffMat = np.tile(inputPoint,(dataSetSize,1))-dataSet  
     sqDiffMat = diffMat ** 2                   
 
     # 计算每一行元素之和
@@ -76,7 +76,7 @@ def trainingDataSet():
     trainingFileList = listdir('trainingDigits')   
     m = len(trainingFileList) #当前目录文件数
     # 初始化m维向量的训练集，每个向量1024维
-    trainingMat = zeros((m,1024))                  
+    trainingMat = np.zeros((m,1024))                  
     for i in range(m):
         fileNameStr = trainingFileList[i]
         # 从文件名中解析分类数字，作为分类标签
@@ -98,7 +98,7 @@ def createDataSet():
     m = len(trainingFileList)   #当前目录文件数
 
     # 初始化m维向量的训练集，每个向量1024维
-    trainingMat = zeros((m,1024))                  
+    trainingMat = np.zeros((m,1024))                  
 
     for i in range(m):
 

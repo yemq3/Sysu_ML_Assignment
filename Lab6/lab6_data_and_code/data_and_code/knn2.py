@@ -38,7 +38,7 @@ def autoNorm(dataSet):
     return normDataSet,ranges,minVals
 
 # k近邻算法
-def classify0(inX,dataSet,labels,k):  
+def classify0(inX,dataSet,labels,k,distance):  
     #inX用于分类的输入向量
     #dataSet输入的训练样本集,
     #labels为标签向量, 
@@ -46,11 +46,17 @@ def classify0(inX,dataSet,labels,k):
     
     #计算距离
     dataSetSize = dataSet.shape[0]
-    diffMat = np.tile(inX,(dataSetSize,1)) - dataSet
-    sqDiffMat = diffMat ** 2
-    sqDistances = sqDiffMat.sum(axis=1) 
-    distances = sqDistances ** 0.5
-    sortedDistIndicies = distances.argsort() 
+    if distance == "l2":
+        diffMat = np.tile(inX,(dataSetSize,1)) - dataSet
+        sqDiffMat = diffMat ** 2
+        sqDistances = sqDiffMat.sum(axis=1) 
+        distances = sqDistances ** 0.5
+        sortedDistIndicies = distances.argsort() 
+    elif distance == "l1":
+        diffMat = np.tile(inX,(dataSetSize,1)) - dataSet
+        absDistances = np.abs(diffMat)
+        distances = absDistances.sum(axis=1) 
+        sortedDistIndicies = distances.argsort() 
     classCount = {}
     #选择距离最小的k个点
     for i in range(k):
@@ -62,7 +68,7 @@ def classify0(inX,dataSet,labels,k):
 
 
 # 分类器针对约会网站的测试代码
-def datingClassTest():
+def datingClassTest(k,distance,train_data_size=1):
     #测试样本的比例
     hoRatio = 0.10      
     datingDataMat,datingLabels = file2matrix("datingTestSet2.txt")
@@ -71,12 +77,19 @@ def datingClassTest():
     #测试样本的数量
     numTestVecs = int(m*hoRatio)  
     errorCount = 0.0
+
+    num_train_data = int((m - numTestVecs) * train_data_size)
+    index = np.random.choice(range(m- numTestVecs), num_train_data, replace=False)
+    train_data = normMat[numTestVecs:m,:][index]
+    label = np.array(datingLabels[numTestVecs:m])[index]
+
     for i in range(numTestVecs):
-        classifierResult = classify0(normMat[i,:],normMat[numTestVecs:m,:],
-                                     datingLabels[numTestVecs:m],4)
-        print("the classifier came back with: %d, the real answer is :%d" %(classifierResult,datingLabels[i]))
+        classifierResult = classify0(normMat[i,:],train_data,
+                                     label,k,distance)
+        # print("the classifier came back with: %d, the real answer is :%d" %(classifierResult,datingLabels[i]))
         if (classifierResult != datingLabels[i]): errorCount +=1.0
-    print("the total error rate is: %f" % (errorCount/float(numTestVecs)))
+    # print("the total error rate is: %f" % (errorCount/float(numTestVecs)))
+    return errorCount/float(numTestVecs)
 
 
 def classifyPerson():
