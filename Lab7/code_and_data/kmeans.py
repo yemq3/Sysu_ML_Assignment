@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-from numpy import *
+import numpy as np
 
 def loadDataSet(fileName):
     
@@ -16,15 +16,15 @@ def loadDataSet(fileName):
 
 def distEclud(vecA, vecB):
           
-    return sqrt(sum(power(vecA - vecB, 2)))     
+    return np.sqrt(np.sum(np.power(vecA - vecB, 2)))     
 
 def randCent(dataSet, k):
         
     #得到数据集的列数
-    n = shape(dataSet)[1]          
+    n = np.shape(dataSet)[1]          
 
     #得到一个K*N的空矩阵
-    centroids = mat(zeros((k,n)))  
+    centroids = np.mat(np.zeros((k,n)))  
 
     #对于每一列
     for j in range(n):             
@@ -36,7 +36,7 @@ def randCent(dataSet, k):
         rangeJ = float(max(dataSet[:,j]) - minJ) 
 
         #在最小值和最大值之间取值
-        centroids[:,j] = mat(minJ + rangeJ * random.rand(k,1)) 
+        centroids[:,j] = np.mat(minJ + rangeJ * np.random.rand(k,1)) 
     return centroids
 
 def distSLC(vecA, vecB):
@@ -47,20 +47,22 @@ def distSLC(vecA, vecB):
     #设所求点A ，纬度β1 ，经度α1 ；点B ，纬度β2 ，经度α2。则距离
     #距离 S=R·arc cos[cosβ1cosβ2cos（α1-α2）+sinβ1sinβ2]
     
-    a = sin(vecA[0,1]*pi/180) * sin(vecB[0,1]*pi/180)
-    b = cos(vecA[0,1]*pi/180) * cos(vecB[0,1]*pi/180) * \
-                      cos(pi * (vecB[0,0]-vecA[0,0]) /180)
+    pi = np.pi
 
-    return arccos(a + b)*6371.0 #6371.0为地球半径
+    a = np.sin(vecA[0,1]*pi/180) * np.sin(vecB[0,1]*pi/180)
+    b = np.cos(vecA[0,1]*pi/180) * np.cos(vecB[0,1]*pi/180) * \
+                      np.cos(pi * (vecB[0,0]-vecA[0,0]) /180)
+
+    return np.arccos(a + b)*6371.0 #6371.0为地球半径
 
 def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
    
      
     # 数据集的行数，即数据的个数
-    m = shape(dataSet)[0]             
+    m = np.shape(dataSet)[0]             
 
     # 簇分配结果矩阵
-    clusterAssment = mat(zeros((m,2)))
+    clusterAssment = np.mat(np.zeros((m,2)))
 
     # 第一列储存簇索引值
     # 第二列储存数据与对应质心的误差
@@ -74,7 +76,7 @@ def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
 
         # 对数据集中的每一个数据
         for i in range(m):            
-            minDist = inf; minIndex = -1
+            minDist = np.inf; minIndex = -1
 
             # 对于每一质心
             for j in range(k):        
@@ -95,12 +97,12 @@ def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
         for cent in range(k):         
 
             # 通过数组过滤得到簇中所有数据
-            ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]
+            ptsInClust = dataSet[np.nonzero(clusterAssment[:,0].A==cent)[0]]
 
             # .A 方法将matrix类型元素转化为array类型
             # 将质心更新为簇中所有数据的均值
 
-            centroids[cent,:] = mean(ptsInClust, axis=0) 
+            centroids[cent,:] = np.mean(ptsInClust, axis=0) 
             # axis=0表示沿矩阵的列方向计算均值
     return centroids, clusterAssment
 
@@ -114,7 +116,7 @@ def clusterPlaces(numClust=5):
     for line in open('Restaurant_Data_Beijing.txt').readlines():
         lineArr = line.split('\t')
         datList.append([float(lineArr[0]),float(lineArr[1])])
-    datMat = mat(datList)
+    datMat = np.mat(datList)
 
     # 进行聚类
     myCentroids, clustAssing = kMeans(datMat, numClust, distMeas=distSLC)
@@ -133,7 +135,7 @@ def clusterPlaces(numClust=5):
    
     for i in range(numClust):                                 
 
-        ptsInCurrCluster = datMat[nonzero(clustAssing[:,0].A==i)[0],:]
+        ptsInCurrCluster = datMat[np.nonzero(clustAssing[:,0].A==i)[0],:]
         markerStyle = scatterMarkers[i % len(scatterMarkers)]
         ax1.scatter(ptsInCurrCluster[:,0].flatten().A[0], ptsInCurrCluster[:,1].flatten().A[0], marker=markerStyle, s=90)
     ax1.scatter(myCentroids[:,0].flatten().A[0], myCentroids[:,1].flatten().A[0], marker='+', s=300)
