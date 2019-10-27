@@ -6,7 +6,7 @@
 '''
 
 # 导入必要库
-from numpy import *
+import numpy as np
 
 # 创建实验样本
 def loadDataSet():
@@ -47,7 +47,7 @@ def train(trainMat,trainCategory):
     numTrain = len(trainMat)
     numWords = len(trainMat[0])  
     pAbusive = sum(trainCategory)/float(numTrain)
-    p0Num = ones(numWords); p1Num=ones(numWords)
+    p0Num = np.ones(numWords); p1Num=np.ones(numWords)
     p0Denom=2.0; p1Denom=2.0
     for i in range(numTrain):
         if trainCategory[i] == 1:
@@ -68,8 +68,8 @@ def train(trainMat,trainCategory):
 
 
 def classfy(vec2classfy,p0Vec,p1Vec,pClass1):
-    p1 = sum(vec2classfy*p1Vec)+log(pClass1)
-    p0 = sum(vec2classfy*p0Vec)+log(1-pClass1)
+    p1 = sum(vec2classfy*p1Vec)+np.log(pClass1)
+    p0 = sum(vec2classfy*p0Vec)+np.log(1-pClass1)
     if p1 > p0:
         return 1;
     else:
@@ -95,7 +95,9 @@ def bagOfWords2Vec(vocabList,inputSet):
 
 
 def spamTest():
-    fullTest = []; docList = []; classLis t= []
+    fullTest = []
+    docList = []
+    classList= []
     # it only 25 doc in every class
     for i in range(1,26): 
         wordList = textParse(open('email/spam/%d.txt' % i,encoding="ISO-8859-1").read())
@@ -111,18 +113,18 @@ def spamTest():
     trainSet = list(range(50));testSet=[]
     # choose 10 sample to test ,it index of trainMat
     for i in range(10):
-        randIndex = int(random.uniform(0,len(trainSet)))#num in 0-49
+        randIndex = int(np.random.uniform(0,len(trainSet)))#num in 0-49
         testSet.append(trainSet[randIndex])
         del(trainSet[randIndex])
     trainMat = []; trainClass = []
     for docIndex in trainSet:
         trainMat.append(bagOfWords2Vec(vocabList,docList[docIndex]))
         trainClass.append(classList[docIndex])
-    p0, p1, pSpam = train(array(trainMat),array(trainClass))
+    p0, p1, pSpam = train(np.array(trainMat),np.array(trainClass))
     errCount = 0
     for docIndex in testSet:
         wordVec=bagOfWords2Vec(vocabList,docList[docIndex])
-        if classfy(array(wordVec),p0,p1,pSpam) != classList[docIndex]:
+        if classfy(np.array(wordVec),p0,p1,pSpam) != classList[docIndex]:
             errCount += 1
             print (("classfication error"), docList[docIndex])
 
