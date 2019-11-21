@@ -134,14 +134,14 @@ def adaClassify(datToClass,classifierArr):
     '''
     dataMatrix = np.mat(datToClass)
     m = np.shape(dataMatrix)[0] 
-    aggClassEst = np.mat(zeros((m,1)))
-    
-    for i in range(len(classifierArr)):
+    aggClassEst = np.mat(np.zeros((m,1)))
+
+    for i in range(len(classifierArr[0])):
         
-        classEst = stumpClassify(dataMatrix,classifierArr[i]['dim'],\
-                                 classifierArr[i]['thresh'],\
-                                 classifierArr[i]['ineq'])
-        aggClassEst += classifierArr[i]['alpha']*classEst
+        classEst = stumpClassify(dataMatrix,classifierArr[0][i]['dim'],\
+                                 classifierArr[0][i]['thresh'],\
+                                 classifierArr[0][i]['ineq'])
+        aggClassEst += classifierArr[0][i]['alpha']*classEst
         #print(aggClassEst)
     return np.sign(aggClassEst)
 
